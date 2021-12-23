@@ -31,15 +31,17 @@ def markerColor(elev):
     else:
         return "blue"
 
-
 map = folium.Map(location=[31.452636429987884, 74.36261585417512], tiles = "Stamen Terrain")
-
 fg = folium.FeatureGroup(name="My Map")
 
 for lt, ln, n, t, el in zip(lat, lon, name, type, elev):
     iframe = folium.IFrame(html=html % (n, t, el), width=200, height=60)
-    fg.add_child(folium.Marker(location=[lt, ln], popup=folium.Popup(iframe), icon=folium.Icon(color=markerColor(el))))
+    fg.add_child(folium.CircleMarker(location=[lt, ln], radius=6, popup=folium.Popup(iframe), fill_color=markerColor(el), color = 'grey', fill=True, fill_opacity=0.7))
+
+fg.add_child(folium.GeoJson(data=open('world.json', 'r', encoding='utf-8-sig').read(), zoom_on_click=True, 
+    style_function=lambda x:{'fillColor': 'green' if x['properties']['POP2005'] < 10000000 
+    else 'orange' if 10000000 <= x['properties']['POP2005'] < 20000000 else 'red'}
+))
 
 map.add_child(fg)
-
 map.save("map.html")
